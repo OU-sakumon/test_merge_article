@@ -1,0 +1,49 @@
+name: Build Magazine PDF
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+    - name: リポジトリのコードをチェックアウト
+      uses: actions/checkout@v4
+
+    - name: 必要なビルドツールのインストール
+      # template/temp および main.tex で利用するパッケージを網羅（不足で File not found を防ぐ）
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          python3 \
+          texlive-lang-japanese \
+          texlive-luatex \
+          texlive-bibtex-extra \
+          biber \
+          texlive-pictures \
+          texlive-latex-extra \
+          texlive-science \
+          texlive-fonts-recommended \
+          latexmk
+        # 依存で入る: platex, dvipdfmx, tikz, tcolorbox, mdframed, biblatex, chemfig, physics 等
+
+    - name: ビルドに必要なコマンドの確認
+      run: |
+        which platex biber dvipdfmx python3
+        platex --version | head -1
+        biber --version | head -1
+
+    - name: makeコマンドの実行
+      run: make
+
+    - name: 生成されたPDFをArtifactsとして保存
+      uses: actions/upload-artifact@v4
+      with:
+        name: magazine-latest-pdf
+        path: main.pdf
+        retention-days: 30

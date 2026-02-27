@@ -1,0 +1,420 @@
+% ルートから取り込まれるときは前文・\begin{document}をスキップ（\mainfile が定義されている）
+\ifx\mainfile\undefined
+\documentclass[twocolumn,10pt,dvipdfmx]{jsbook}
+\usepackage[backend=biber, style=numeric, sorting=none]{biblatex}
+\addbibresource{bib.bib} % bibファイルを指定（拡張子.bibが必要）
+\def\pgfsysdriver{pgfsys-dvipdfmx.def}%tikzが表示されないのを改善
+\usepackage{tikz}
+\usetikzlibrary{calc, positioning, shapes.geometric, shadows, shadows.blur,decorations.pathmorphing}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable, skins, theorems}
+\usepackage{mdframed} %2/15追加
+\usepackage{color}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancybox}
+\usepackage{ascmac}
+\usepackage[italicdiff]{physics}
+\usepackage{bm}
+\usepackage[shortlabels]{enumitem} 
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{titletoc}
+\usepackage{chemfig}
+\usepackage{mhchem}
+\usepackage{url}
+\usepackage{here}
+\graphicspath{image/}
+\usepackage{caption}%%%%%%%画像のために追加%%%%%%%%%%%%%%%%%
+%定理や定義などのboxを作ります
+% --- 共通のデザイン設定 ---
+\newtcbtheorem[number within=chapter]{thm}{定理}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newtcbtheorem[number within=chapter]{chui}{注意}{
+    enhanced,
+    colframe=white,    % 枠の色
+    colback=white,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=0pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newtcbtheorem[number within=chapter]{dfn}{定義}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newenvironment{myleftbar}[1]{%
+  \def\FrameCommand{{\color{#1}\vrule width 3pt }\hspace{10pt}}%
+  \MakeFramed {\advance\hsize-\width \FrameRestore}}%
+ {\endMakeFramed\par}
+% ---------------------------------------
+
+%2/15追加、証明解答環境
+\renewcommand{\proofname}{\textbf{証明}}
+
+% proof環境に左線を追加する設定
+\surroundwithmdframed[
+  topline=false,
+  bottomline=false,
+  leftline=true,        % 左線あり
+  rightline=false,
+  linecolor=gray,       % 線の色
+  linewidth=3pt,        % 線の太さ
+  innerleftmargin=10pt, % 線と本文の間隔
+  innerrightmargin=0pt,
+  skipabove=5pt,
+  skipbelow=5pt
+]{proof}
+
+\newenvironment{sol}[1][]{%
+  \renewcommand{\qedsymbol}{}%□を空にする
+  \let\qed\relax
+  \ifx\relax#1\relax
+    \begin{proof}[\textbf{解答}]%
+  \else
+    \begin{proof}[\textbf{解答}~#1]%
+  \fi
+}{%
+  \end{proof}%
+}
+
+\newenvironment{expl}[1][]{%
+  \renewcommand{\qedsymbol}{}%□を空にする
+  \let\qed\relax
+  \ifx\relax#1\relax
+    \begin{proof}[\textbf{解説}]%
+  \else
+    \begin{proof}[\textbf{解説}~#1]%
+  \fi
+}{%
+  \end{proof}%
+}
+
+\newtcbtheorem[number within=chapter]{mon}{問題}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newtcbtheorem[number within=chapter]{ex}{例題}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newtcbtheorem[number within=chapter]{Lem}{補題}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newtcbtheorem[number within=chapter]{prop}{命題}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newtcbtheorem[number within=chapter]{cor}{系}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+
+\newtcbtheorem[number within=chapter]{rei}{例}{
+    enhanced,
+    colframe=black!75,    % 枠の色
+    colback=gray!10,      % 背景の色
+    coltitle=black,       % タイトルの色（本文と同じ場所にくるので黒にする）
+    fonttitle=\bfseries,  % タイトルを太字に
+    boxrule=1pt,          % 枠の太さ
+    arc=3mm,              % 角の丸み
+    attach title to upper,% ★重要：タイトルを独立させず本文と一体化する
+    after title={.\ },    % タイトルの後ろにピリオドとスペースを入れる
+    breakable             % ページまたぎを許可
+}{th}
+%%%%%%%%%定理，問題環境終了%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%黒田さんが欲しがっていたnewcommand%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\ovec#1{\overrightarrow{\mathrm{#1}}}%ベクトル略記
+\def\qed{$\Box$}%証明終了
+\def\d{\displaystyle}
+\newcommand{\maru}[1]{\raise0.2ex\hbox{\textcircled{\scriptsize{#1}}}}%\maruコマンド
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{0}
+
+%%%%%%%%%%%%%%%%%%%共テのボックス%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\set{\setlength{\fboxrule}{1pt}}
+\usepackage{framed}
+\def\b#1{\set\textgt{\fbox{\hspace{3mm}#1\hspace{3mm}}}}
+\def\db#1{\set\textgt{\setlength{\fboxsep}{0.7mm}\fbox{{\setlength{\fboxrule}{0.1mm}\setlength{\fboxsep}{0.5mm}\fbox{\hspace{3mm}#1\hspace{3mm}}}}}}
+\def\sqrtb#1{\set\sqrt{
+		\hspace{0.7mm}
+		\textgt{\fbox{\hspace{3mm}#1\hspace{3mm}}}
+		\hspace{0.7mm}
+}}
+\def\bb#1{{\setlength{\fboxrule}{0.4pt}\fbox{\hspace{3mm}#1\hspace{3mm}}}}
+\def\sqrtbb#1{\sqrt{\hspace{0.7mm}{\setlength{\fboxrule}{0.4pt}\fbox{\hspace{3mm}#1\hspace{3mm}}}\hspace{0.7mm}}}
+\def\dbb#1{\setlength{\fboxrule}{0.1mm}\setlength{\fboxsep}{0.7mm}\fbox{{\setlength{\fboxrule}{0.1mm}\setlength{\fboxsep}{0.7mm}\fbox{\hspace{3mm}#1\hspace{3mm}}}}}
+
+%%%%%全角数字など
+
+\makeatletter
+\newcommand\@zarabic[1]{%
+	\ifcase#1\or １\or ２\or ３\or ４\or ５\or ６\or ７\or ８\or ９\or １０\or
+	１１\or １２\or １３\or １４\or １５\or １６\or １７\or １８\or １９\or ２０\or
+	２１\or ２２\or ２３\or ２４\or ２５\or ２６\or ２７\or ２８\or ２９\or ３０\else\@ctrerr\fi}
+\newcommand\zarabic[1]{\expandafter\@zarabic\expandafter{\number#1}}
+\makeatother
+
+\AddEnumerateCounter{\zarabic}{\@zarabic}{１}
+\newcommand\daimon{{\Large\setlength{\fboxrule}{1pt}\fbox{\zarabic{\arabic*}}}}
+%%%%%全角数字など
+
+\def\set{\setlength{\fboxrule}{1pt}}
+\usepackage{framed}
+\def\b#1{\set\textgt{\fbox{\hspace{3mm}#1\hspace{3mm}}}}
+\def\db#1{\set\textgt{\setlength{\fboxsep}{0.7mm}\fbox{{\setlength{\fboxrule}{0.1mm}\setlength{\fboxsep}{0.5mm}\fbox{\hspace{3mm}#1\hspace{3mm}}}}}}
+\def\sqrtb#1{\set\sqrt{
+		\hspace{0.7mm}
+		\textgt{\fbox{\hspace{3mm}#1\hspace{3mm}}}
+		\hspace{0.7mm}
+}}
+\def\bb#1{{\setlength{\fboxrule}{0.4pt}\fbox{\hspace{3mm}#1\hspace{3mm}}}}
+\def\sqrtbb#1{\sqrt{\hspace{0.7mm}{\setlength{\fboxrule}{0.4pt}\fbox{\hspace{3mm}#1\hspace{3mm}}}\hspace{0.7mm}}}
+\def\dbb#1{\setlength{\fboxrule}{0.1mm}\setlength{\fboxsep}{0.7mm}\fbox{{\setlength{\fboxrule}{0.1mm}\setlength{\fboxsep}{0.7mm}\fbox{\hspace{3mm}#1\hspace{3mm}}}}}
+
+
+
+% 目次の「章（chapter）」のデザイン定義
+\titlecontents{chapter}[0pt]                 % 左端の余白
+  {\addvspace{1.5em}}                        % 各項目の上の間隔
+  {                                          % 【番号付きの章のデザイン】
+    \begin{tikzpicture}[remember picture, baseline={(0, -0.1)}]
+      % 章番号の入るボックス（影付き）
+      \node[
+        fill=black!10,                       % 背景色（薄いグレー）
+        draw=none,                           % 枠線なし
+        rounded corners=3pt,                 % 角を丸く
+        inner sep=6pt,                       % 内側の余白
+        font=\sffamily\bfseries\large,       % フォント設定
+        drop shadow={opacity=0.2, shadow xshift=1pt, shadow yshift=-1pt} % 影
+      ] (num) {第\thecontentslabel 章};
+    \end{tikzpicture}
+    \hspace{1em}                             % 番号とタイトルの間のスペース
+    \bfseries\large\sffamily                 % タイトルのフォント設定
+  }
+  {\bfseries\large\sffamily}                                         % 
+  {\hfill \bfseries \thecontentspage}        % ページ番号（右端に太字で）
+
+%% --- ここからデザイン設定 --- %%
+% #1: タイトル
+% #2: 所属
+% #3: 名前
+% #4: 前提知識
+% #5: 概要
+\newcommand{\CustomChapter}[5]{
+  % 1. 章番号
+\refstepcounter{chapter}
+  \markboth{第\thechapter 章\quad #1}{第\thechapter 章\quad #1}
+  \addcontentsline{toc}{chapter}{\protect\numberline{\thechapter}#1
+  \hspace{0em}
+    {：#3}% 名前
+    \vspace{2mm}
+    \newline
+    \hspace{22mm}
+    {\small 前提知識：#4}
+  }
+  \noindent
+  \begin{center}{{\huge\sffamily 第\thechapter 章} }\end{center}
+  \par            
+  \vspace{0.5em}   % 章番号とタイトルの間の少しの隙間
+  
+  % 2. タイトル（下の行に表示）
+  \noindent
+  \begin{center}{{\Huge\sffamily #1} }\end{center}
+  \par
+  
+  \vspace{1cm}
+  
+  % 2. 所属と名前
+  \begin{center}
+    {\Large
+    \begin{tabular}{ll}
+      所\quad 属 \quad ：& #2 \\[1em]
+      名\quad 前 \quad ：& #3 \\
+    \end{tabular}
+    }
+  \end{center}
+  
+  \vspace{1cm}
+  \noindent
+  {\large\sffamily\textbf{■ 前提知識}} \\
+  \vspace{0.2em}
+  #4
+  \par
+  \vspace{1mm}
+  
+  \noindent
+  {\large\sffamily\textbf{■ 概 要}} \\
+  \vspace{0.2em}
+  #5
+}
+
+%% --- デザイン設定ここまで --- %%
+\makeatletter
+\makeatother
+
+\pagestyle{headings}
+\begin{document}
+\fi
+% 表題ブロック（単体時もルート取り込み時も出力；ルートでは \firstarticle で1本目は \twocolumn[、2本目以降は \onecolumn→\twocolumn）
+\ifx\mainfile\undefined
+\thispagestyle{empty}
+\twocolumn[
+\addcontentsline{toc}{chapter}
+{\textbf{
+{\Large 記事の分類}}}%分野分けのための部分
+\CustomChapter
+  {テスト記事1（画像あり）}% タイトル
+  {サンプル大学　サンプル学部　1年}% 所属
+  {著者A}% 名前
+  {特になし}% 前提知識
+  {部誌テスト用の記事1です。画像を1枚挿入し、参考文献を呼び出します。} % 概要
+  %中学1年生、僕は高校によって教科書が違っていることを知った。高校受験を失敗すると大学受験も失敗すると思った。大学受験を終え、大学院進学を希望しながらも就職活動を経た4回生が書く、学歴について再考察したことを書いた。
+\par
+\vspace{1cm}
+\noindent
+\hrulefill
+]
+\else
+\ifx\firstarticle\undefined
+\onecolumn
+\thispagestyle{empty}
+\CustomChapter
+  {テスト記事1（画像あり）}% タイトル
+  {サンプル大学　サンプル学部　1年}% 所属
+  {著者A}% 名前
+  {特になし}% 前提知識
+  {部誌テスト用の記事1です。画像を1枚挿入し、参考文献を呼び出します。} % 概要
+\par
+\vspace{1cm}
+\noindent
+\hrulefill
+\twocolumn
+\else
+\thispagestyle{empty}
+\twocolumn[
+\addcontentsline{toc}{chapter}{\textbf{\Large 記事の分類}}
+\CustomChapter
+  {テスト記事1（画像あり）}% タイトル
+  {サンプル大学　サンプル学部　1年}% 所属
+  {著者A}% 名前
+  {特になし}% 前提知識
+  {部誌テスト用の記事1です。画像を1枚挿入し、参考文献を呼び出します。} % 概要
+\par
+\vspace{1cm}
+\noindent
+\hrulefill
+]
+\fi
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%これより下に本文を書いてください（ルート取り込み時もここからが出力される）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifx\mainfile\undefined\graphicspath{image/}\else\graphicspath{{articles/article_1/image/}}\fi
+
+\section{テスト記事1の見出し}
+
+これは記事1のテスト用本文です。部誌の統合ビルドや画像の読み込みが正しく行われるかを確認するためのダミー文です。
+
+\subsection{第一節}
+
+ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。
+
+\subsection{画像の挿入}
+
+記事1では画像を1枚読み込みます（\ref{fig:article1-img}）。
+
+\ifx\mainfile\undefined\def\articleoneimgpath{image/article1_image1.jpeg}\else\def\articleoneimgpath{articles/article_1/image/article1_image1.jpeg}\fi
+\begin{figure}[htbp]
+  \centering
+  \IfFileExists{\articleoneimgpath}{\includegraphics[width=0.8\linewidth]{article1_image1.jpeg}}{\par\small 画像（article1\_image1.jpeg）を image/ に配置してください}
+  \caption{記事1のテスト画像}
+  \label{fig:article1-img}
+\end{figure}
+
+\subsection{第二節}
+
+ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。ダミーテキストです。参考文献\cite{test-ref-1}を参照。
+
+\subsection{まとめ}
+
+以上が記事1のテスト本文です。
+
+\printbibliography[heading=subbibliography, title={参考文献}]
+\makeatletter
+\@ifundefined{c@inroot}{\makeatother\end{document}}{\makeatother\endinput}
+\makeatother
